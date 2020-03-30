@@ -6,6 +6,16 @@ import spotipy.util as sp_util
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOauthError
 from spotipy.client import SpotifyException
 
+
+import os
+os.getcwd()
+
+os.chdir('/Users/sean/PycharmProjects/Muser/4.453-Creative-ML-for-Design/spotify-api-starter-master/src')
+os.getcwd()
+
+
+
+
 from display_utils import (
     print_header,
     track_string,
@@ -77,11 +87,11 @@ Great, we have {} {}!  What would you like to see for these tracks:
                 print('Error: Invalid input.')
 
             if display_choice == '1':
-                get_audio_features(spotify, selected_tracks, pretty_print=True)
+                selected_tracks['audio_features'] = get_audio_features(spotify, selected_tracks, pretty_print=True)
             elif display_choice == '2':
-                get_audio_analysis(spotify, selected_tracks, pretty_print=True)
+                selected_tracks['audio_analysis'] = get_audio_analysis(spotify, selected_tracks, pretty_print=True)
 
-
+        print("selected_tracks: ", selected_tracks)
         # Prompt the user to run again
         retry_input = input('\nRun the program again? (Y/N): ')
         # if retry_input == 'y':
@@ -107,7 +117,7 @@ def get_audio_features(spotify, tracks, pretty_print=False):
     track_map = {track.get('id'): track for track in tracks}
 
     # Request the audio features for the chosen tracks (limited to 50)
-    print_header('Getting Audio Features...')
+    # print_header('Getting Audio Features...')
     tracks_features_response = spotify.audio_features(tracks=track_map.keys())
     track_features_map = {f.get('id'): f for f in tracks_features_response}
 
@@ -137,7 +147,7 @@ def get_audio_analysis(spotify, tracks, pretty_print=False):
     # can be really big
     tracks_analysis = {}
 
-    print_header('Getting Audio Audio Analysis...')
+    # print_header('Getting Audio Audio Analysis...')
     for track_id in track_map.keys():
         analysis = spotify.audio_analysis(track_id)
         tracks_analysis[track_id] = analysis
@@ -206,8 +216,9 @@ def search_track(spotify):
     # Request the features for this track from the spotify API
     # get_audio_features(spotify, [selected_track])
 
+    print("selected_track", selected_track)
     return [selected_track]
-
+    # return selected_track
 
 
 def list_playlists(spotify, username):
@@ -289,6 +300,73 @@ def list_library(spotify, username):
 
     return selected_tracks
 
-if __name__ == '__main__':
-    main()
 
+######################################
+# if __name__ == '__main__':
+#     main()
+######################################
+
+spotify = authenticate_client()
+
+# selected_tracks = search_track(spotify)
+
+# suppose we assume that we choose the first song on the list
+
+def print_audio_analysis(my_track):
+    # print("my_track: ", my_track)
+
+    audio_analysis_key = list(my_track.get('audio_analysis').keys())[0]
+    # print(audio_analysis_key)
+
+
+    my_track_audio_analysis = my_track.get('audio_analysis').get(audio_analysis_key)
+
+
+    for key in list(my_track_audio_analysis.keys()):
+        print("Feature: ", key)
+        key_feature = my_track_audio_analysis.get(key)
+        # print(type(key_feature))
+
+        if type(key_feature) == list:
+            print("Length:  ", len(key_feature))
+        else:
+            print("Length: ", 1)
+
+        print("Audio Analysis: ", key_feature,'\n')
+
+
+def get_music_features(my_song):
+
+    search_item = my_song
+    spotify = authenticate_client()
+    item_list = spotify.search(search_item)
+    selected_tracks = [item_list.get('tracks').get('items', [])[0]]
+
+# print(type(selected_tracks))
+# print(selected_tracks)
+
+    my_track = selected_tracks[0]
+
+
+    my_track['audio_features'] = get_audio_features(spotify, selected_tracks, pretty_print=False)
+
+    my_track['audio_analysis'] = get_audio_analysis(spotify, selected_tracks, pretty_print=False)
+
+    print('Song: ', my_song)
+
+
+    print('Audio Features: ', my_track.get('audio_features'))
+
+    print_audio_analysis(my_track)
+
+    return my_track
+
+song_list = ['lover', 'shape of you', '龙卷风']
+song_features = {}
+
+for my_song in song_list:
+    my_track = get_music_features(my_song)
+    song_features[my_song] = my_track
+
+# print(song_features)
+# get_music_features('shape of you')
