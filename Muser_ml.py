@@ -11,9 +11,7 @@ import os
 os.getcwd()
 
 os.chdir('/Users/sean/PycharmProjects/Muser/4.453-Creative-ML-for-Design/spotify-api-starter-master/src')
-os.getcwd()
-
-
+print(os.getcwd())
 
 
 from display_utils import (
@@ -361,6 +359,13 @@ def get_music_features(my_song):
 
     return my_track
 
+
+import pandas as pd
+os.chdir('/Users/sean/PycharmProjects/Muser/4.453-Creative-ML-for-Design')
+
+# music_data = pd.read_csv('music-list.csv')
+# print(music_data)
+
 song_list = ['lover', 'shape of you', '龙卷风']
 song_features = {}
 
@@ -368,5 +373,5 @@ for my_song in song_list:
     my_track = get_music_features(my_song)
     song_features[my_song] = my_track
 
-# print(song_features)
-# get_music_features('shape of you')
+print(song_features)
+get_music_features('shape of you')
